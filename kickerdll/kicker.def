@@ -1,0 +1,5 @@
+LIBRARY	kicker
+SECTIONS
+	jp_soramimi_kicker_shared_data READ WRITE SHARED
+EXPORTS
+	GetKickerAPI1
