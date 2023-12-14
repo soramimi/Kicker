@@ -8,7 +8,7 @@
 #include <windows.h>
 #include <set>
 #include "resource.h"
-
+#include <Psapi.h>
 #include "common.h"
 
 HINSTANCE _hInstance = 0;
@@ -176,6 +176,61 @@ HWND GetInputTargetWindow()
 	}
 }
 
+HCURSOR CreateTransparentCursor()
+{
+	// 1x1の透明なビットマップを作成
+	HBITMAP hBitmap = CreateBitmap(1, 1, 1, 1, NULL);
+
+	// ICONINFO構造体の準備
+	ICONINFO iconInfo = {};
+	iconInfo.fIcon = FALSE;  // カーソル用
+	iconInfo.xHotspot = 0;
+	iconInfo.yHotspot = 0;
+	iconInfo.hbmMask = hBitmap;
+	iconInfo.hbmColor = hBitmap;
+
+	// HCURSORを作成
+	HCURSOR hCursor = CreateIconIndirect(&iconInfo);
+
+	// ビットマップのクリーンアップ
+	DeleteObject(hBitmap);
+
+	return hCursor;
+}
+
+wchar_t const *wcsistr(wchar_t const *a, wchar_t const *b)
+{
+	int na = wcslen(a);
+	int nb = wcslen(b);
+	for (int i = 0; i + nb <= na; i++) {
+		if (wcsnicmp(a + i, b, nb) == 0) {
+			return a + i;
+		}
+	}
+	return nullptr;
+}
+
+bool isHideCursorEnabled()
+{
+	HWND hwnd = GetForegroundWindow();
+	DWORD processID;
+	GetWindowThreadProcessId(hwnd, &processID);
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+	wchar_t processName[MAX_PATH];
+	processName[0] = 0;
+	if (hProcess != NULL) {
+		GetModuleFileNameEx(hProcess, 0, processName, MAX_PATH);
+	}
+	CloseHandle(hProcess);
+#if 0
+	if (wcsistr(processName, L"blender")) {
+		return false;
+	}
+	return true;
+#else
+	return SendMessage(s_transparent_hwnd, WM_KICKER_HIDE_CURSOR_ENABLED, 0, (LPARAM)processName) != 0;
+#endif
+}
 
 LRESULT CALLBACK MyKeyboardHookLL(int code, WPARAM wParam, LPARAM lParam)
 {
@@ -212,7 +267,9 @@ LRESULT CALLBACK MyKeyboardHookLL(int code, WPARAM wParam, LPARAM lParam)
 		}
 
 		if (vk == VK_LEFT || vk == VK_RIGHT || vk == VK_UP || vk == VK_DOWN) { // hide cursor
-			hide_cursor();
+			if (isHideCursorEnabled()) {
+				hide_cursor();
+			}
 		} else if ((vk >= 'A' && vk <= 'Z') || vk == VK_OEM_COMMA || vk == VK_OEM_PERIOD || vk == VK_SPACE || vk == VK_RETURN || vk == VK_TAB || vk == VK_ESCAPE || vk == VK_BACK || isVirtualColon(vk)) {
 			if (pressed) {
 				if (s_special) {

@@ -427,6 +427,14 @@ bool KickerLibrary::nativeEventFilter(const QByteArray & /*eventType*/, void *me
 //		priv->status_text = QString::fromUtf8((char const *)msg->lParam, msg->wParam);
 		the_mainwindow->setStatusText((char const *)msg->lParam, msg->wParam);
 		return true;
+	} else if (msg->message == WM_KICKER_HIDE_CURSOR_ENABLED) {
+		QString path = QString::fromUtf16((ushort const *)msg->lParam);
+		if (path.indexOf("blender", Qt::CaseInsensitive) >= 0) {
+			*result = 0;
+		} else {
+			*result = 1;
+		}
+		return true;
 	}
 	return false;
 }
