@@ -329,13 +329,13 @@ bool loadShortcutDefines(QString const &path, std::vector<ShortcutItem> *out)
 		switch (reader.readNext()) {
 		case QXmlStreamReader::StartElement:
 			if (state_stack.empty()) {
-				if (reader.name() == "items") {
+				if (reader.name().toString() == "items") {
 					state = STATE_ITEMS;
 				}
 			} else if (laststate == STATE_ITEMS) {
-				QStringRef data;
+				QStringView data;
 				QXmlStreamAttributes atts = reader.attributes();
-				if (reader.name() == "item") {
+				if (reader.name().toString() == "item") {
 					item = ShortcutItem();
 					QString key = atts.value("key").toString();
 					if (key.size() == 1 && key[0].isLetter()) {
@@ -344,9 +344,9 @@ bool loadShortcutDefines(QString const &path, std::vector<ShortcutItem> *out)
 					state = STATE_ITEMS_ITEM;
 				}
 			} else if (laststate == STATE_ITEMS_ITEM) {
-				if (reader.name() == "name") {
+				if (reader.name().toString() == "name") {
 					state = STATE_ITEMS_ITEM_NAME;
-				} else if (reader.name() == "command") {
+				} else if (reader.name().toString() == "command") {
 					state = STATE_ITEMS_ITEM_COMMAND;
 				}
 			}

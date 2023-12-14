@@ -3,7 +3,7 @@
 #include "ShellExecuteDialog.h"
 #include "ui_ShellExecuteDialog.h"
 #include "win.h"
-#include <QDesktopWidget>
+#include <QScreen>
 
 ShellExecuteDialog::ShellExecuteDialog(QWidget *parent) :
 	QDialog(parent),
@@ -14,7 +14,8 @@ ShellExecuteDialog::ShellExecuteDialog(QWidget *parent) :
 	flags &= ~Qt::WindowContextHelpButtonHint;
 	setWindowFlags(flags);
 
-	QRect screen = QApplication::desktop()->screenGeometry();
+	QRect screen = QApplication::primaryScreen()->geometry();
+	qDebug() << screen;
 	move(screen.center() - rect().center());
 
 	bool isadmin = IsUserAnAdmin();

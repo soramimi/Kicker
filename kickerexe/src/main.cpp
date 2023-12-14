@@ -17,6 +17,9 @@ QString applicationDataDir()
 
 int main(int argc, char *argv[])
 {
+	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+	putenv("QT_ENABLE_HIGHDPI_SCALING=0");
+
 	MyApplication a(argc, argv);
 	the_options = &a.options;
 

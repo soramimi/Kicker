@@ -374,7 +374,7 @@ WPARAM KickerLibrary::translateKey(WPARAM vk, bool shift) const
 	return ch;
 }
 
-bool KickerLibrary::nativeEventFilter(const QByteArray & /*eventType*/, void *message, long *result)
+bool KickerLibrary::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
 	MSG *msg = (MSG *)message;
 	if (msg->message == WM_KICKER_INPUTKEY) {

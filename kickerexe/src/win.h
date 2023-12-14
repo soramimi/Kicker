@@ -27,7 +27,7 @@ private:
 	WPARAM translateKey(WPARAM ch, bool shift) const;
 
 	void onShellExecute(MSG *msg);
-	virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result);
+	bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
 	static HMODULE load_(char const *path, KICKER_API_1 *api);
 	bool GetRequest(int vk, Request *req);
 	void Invoke(Request const &req);
